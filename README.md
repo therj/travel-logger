@@ -35,7 +35,7 @@ VS Code Node Debugger Configuration
       "port": 9229,
       "address": "localhost",
       "restart": true,
-      "stopOnEntry":false,
+      "stopOnEntry": false,
       "sourceMaps": false,
       "localRoot": "${workspaceRoot}",
       "remoteRoot": "${workspaceRoot}"
