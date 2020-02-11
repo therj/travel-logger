@@ -1,10 +1,58 @@
+/* eslint-disable no-console */
+const dotenv = require('dotenv');
+const dotenvExpand = require('dotenv-expand');
+const dotenvExtended = require('dotenv-extended');
 const express = require('express');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
+const mongoose = require('mongoose');
+const logs = require('./api/logs');
 const middleware = require('./middleware');
 
 const app = express();
+
+const config = dotenv.config({
+  debug: process.env.DEBUG,
+  path: '.env',
+});
+if (config.error) {
+  throw config.error;
+}
+
+dotenvExtended.load({
+  encoding: 'utf8',
+  silent: true,
+  path: '.env',
+  defaults: '.env.defaults',
+  schema: '.env.schema',
+  errorOnMissing: true,
+  errorOnExtra: true,
+  errorOnRegex: true,
+  includeProcessEnv: false,
+  assignToProcessEnv: true,
+  overrideProcessEnv: false,
+});
+dotenvExpand(config);
+
+
+mongoose.connect(process.env.MONGO_CONNECTION_STRING, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false,
+  useCreateIndex: true,
+})
+  .then(() => {
+    console.log('******************************');
+    console.log('Database Connected!');
+    console.log('******************************');
+  })
+  .catch((err) => {
+    console.log('******************************');
+    console.log('Database Error!\n', err);
+    console.log('******************************');
+  });
+
 app.use(morgan('common'));
 app.use(helmet());
 
@@ -21,19 +69,22 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(express.json());
 
 app.get('/', (req, res) => {
   res.json({
-    message: 'hello',
+    message: '🚀',
   });
 });
 
+app.use('/api/logs', logs);
 
 app.use(middleware.notFound);
 app.use(middleware.errorHandler);
 
 const port = process.env.PORT || 2999;
 app.listen(port, () => {
-  // eslint-disable-next-line no-console
-  console.info(`Listening on at ${process.env.HOST}: ${port}`);
+  console.log('******************************');
+  console.log(`Listening on port ${port}`);
+  console.log('******************************');
 });

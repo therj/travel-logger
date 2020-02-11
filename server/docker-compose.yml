@@ -1,0 +1,52 @@
+version: "3.3"
+services:
+  # mongo:
+  #   image: mongo:4.2.3
+  #   env_file:
+  #     - .env
+  #   container_name: logEntry_mongo
+  #   hostname: mongodb
+  #   restart: on-failure
+  #   environment:
+  #     MONGO_INITDB_USERNAME: root
+  #     MONGO_INITDB_PASSWORD: root
+  #     MONGO_INITDB_DATABASE: root
+  #     MONGO_USER: ${MONGO_USER}
+  #     MONGO_PASS: ${MONGO_PASS}
+  #     MONGO_DATABASE: ${MONGO_DATABASE}
+  #   volumes:
+  #     - ./.docker/mongodb/mongod.conf:/etc/mongod.conf
+  #     - ./.docker/mongodb/initdb.d/:/docker-entrypoint-initdb.d/
+  #     - ./.docker/mongodb/data/db/:/data/db/
+  #     - ./.docker/mongodb/data/log/:/var/log/mongodb/
+  #   ports:
+  #     - '27017-27019:27017-27019'
+  #   command: ['-f', '/etc/mongod.conf']
+
+  # logEntry:
+  #   container_name: logEntry
+  #   image: node:12.15.0-alpine
+  #   env_file:
+  #     - .env
+  app:
+    container_name: docker-node-mongo
+    image: node:12.15.0-alpine
+    restart: always
+    build: .
+    volumes:
+      # Mounts the project directory on the host to /usr/src/app inside the container
+      # allowing you to modify the code without having to rebuild the image.
+      - ./:/usr/src/app
+      # Just specify a path and let the Engine create a volume.
+      # node_modules from this new volume will be used and not from your local dev env
+      - /usr/src/app/node_modules
+    ports:
+      - "80:2999"
+    links:
+      - mongo
+
+  mongo:
+    container_name: mongo
+    image: mongo:4.2.3
+    # ports:
+    #   - "27017-27019:27017-27019"

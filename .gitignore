@@ -116,3 +116,5 @@ psd
 thumb
 sketch
 
+# docker mapped volume
+.docker

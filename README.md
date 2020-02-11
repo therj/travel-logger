@@ -7,7 +7,7 @@
   - [x] Setup Linter
   - [x] Setup Express App
   - [x] Setup 404 and error middlewares
-- [ ] Model DB
+- [x] Model DB
   - Plan data to store
 - [ ] Setup Mongoose Models
 - [ ] POST /logs
