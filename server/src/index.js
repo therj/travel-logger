@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
-const dotenv = require('dotenv');
 const dotenvExpand = require('dotenv-expand');
-const dotenvExtended = require('dotenv-extended');
+const dotenvSafe = require('dotenv-safe');
 const express = require('express');
 const morgan = require('morgan');
 const helmet = require('helmet');
@@ -12,29 +11,16 @@ const middleware = require('./middleware');
 
 const app = express();
 
-const config = dotenv.config({
-  debug: process.env.DEBUG,
-  path: '.env',
+const envConfig = dotenvSafe.config({
+  allowEmptyValues: true,
+  example: '.env.example',
 });
-if (config.error) {
-  throw config.error;
+
+dotenvExpand(envConfig);
+
+if (envConfig.error) {
+  throw envConfig.error;
 }
-
-dotenvExtended.load({
-  encoding: 'utf8',
-  silent: true,
-  path: '.env',
-  defaults: '.env.defaults',
-  schema: '.env.schema',
-  errorOnMissing: true,
-  errorOnExtra: true,
-  errorOnRegex: true,
-  includeProcessEnv: false,
-  assignToProcessEnv: true,
-  overrideProcessEnv: false,
-});
-dotenvExpand(config);
-
 
 mongoose.connect(process.env.MONGO_CONNECTION_STRING, {
   useNewUrlParser: true,
@@ -56,7 +42,10 @@ mongoose.connect(process.env.MONGO_CONNECTION_STRING, {
 app.use(morgan('common'));
 app.use(helmet());
 
-const whitelist = ['http://localhost:2999', 'http://localhost:3000', 'http://192.168.0.100', undefined];
+const whitelist = process.env.CORS_WHITELIST
+  .split(',').map((x) => x.trim());
+// eslint-disable-next-line eqeqeq
+if (process.env.CORS_SELF == 1) { whitelist.push(undefined); }
 // same origin requests will have origin undefined, required if you want to hit api through browser!
 const corsOptions = {
   origin: (origin, callback) => {
