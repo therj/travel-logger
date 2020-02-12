@@ -1,26 +1,17 @@
-FROM node:12.15.0-alpine
+FROM node:12.15.0
 
-WORKDIR /usr/src/app
+ENV NPM_CONFIG_LOGLEVEL info
+
+WORKDIR /home/node/app
 
 COPY package*.json ./
-
 RUN npm install
-
 COPY . .
 
-# Make app available to other containers within links
-# EXPOSE 2999
 
+# docker-compose command will override this
 # CMD ["npm", "run", "dev"]
 
-# Debugger must be attached for it to even respond
-# CMD ["npm", "run", "debug"]
 
-# Same as above but binds to all interfaces
-CMD ["npm", "run", "debug:all"]
-
-
-FROM mongo:4.2.3
-
-# Make app available to other containers within links
-EXPOSE 27017
+# FROM mongo:4.2.3
+# EXPOSE 27017

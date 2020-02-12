@@ -1,4 +1,4 @@
-version: "3.3"
+version: "3.7"
 services:
   # mongo:
   #   image: mongo:4.2.3
@@ -30,23 +30,49 @@ services:
   #     - .env
   app:
     container_name: docker-node-mongo
-    image: node:12.15.0-alpine
+    image: node:12.15.0
+    working_dir: /home/node/app
     restart: always
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # args:
+      cache_from:
+        - node:12.15.0
+      shm_size: "2gb"
     volumes:
-      # Mounts the project directory on the host to /usr/src/app inside the container
+      # Mounts the project directory on the host to /home/node/app inside the container
       # allowing you to modify the code without having to rebuild the image.
-      - ./:/usr/src/app
+
+      - ./:/home/node/app
+      - ./.docker/mongodb/data:/data
       # Just specify a path and let the Engine create a volume.
       # node_modules from this new volume will be used and not from your local dev env
-      - /usr/src/app/node_modules
+      - /home/node/app/node_modules
     ports:
       - "80:2999"
+    # Make app available to other containers within links
+    expose:
+      - "2999"
     links:
       - mongo
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
 
+    # Just node, no auto restarts
+    # command: "npm run start"
+    # Just nodemon
+    # command: "npm run dev"
+    # Debugger must be attached for it to even respond
+    # command: "npm run debug"
+    # Same as above but binds to all interfaces
+    command: "npm run debug:all"
   mongo:
     container_name: mongo
     image: mongo:4.2.3
-    # ports:
-    #   - "27017-27019:27017-27019"
+    ports: # not required
+      - "27017-27019:27017-27019"
