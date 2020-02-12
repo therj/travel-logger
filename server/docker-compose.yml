@@ -35,7 +35,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Node.Dockerfile
       # args:
       cache_from:
         - node:12.15.0
@@ -63,16 +63,23 @@ services:
         max_attempts: 3
         window: 120s
 
-    # Just node, no auto restarts
+    ## Just node, no auto restarts
     # command: "npm run start"
-    # Just nodemon
+    ## Just nodemon
     # command: "npm run dev"
-    # Debugger must be attached for it to even respond
+    ## Debugger must be attached for it to even respond
     # command: "npm run debug"
-    # Same as above but binds to all interfaces
+    ## Same as above but binds to all interfaces
     command: "npm run debug:all"
   mongo:
     container_name: mongo
     image: mongo:4.2.3
     ports: # not required
       - "27017-27019:27017-27019"
+    build:
+      context: .
+      # args:
+      cache_from:
+        - mongo:4.2.3
+      shm_size: "2gb"
+      dockerfile: Mongo.Dockerfile
