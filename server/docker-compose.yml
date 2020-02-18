@@ -1,36 +1,8 @@
 version: "3.7"
 services:
-  # mongo:
-  #   image: mongo:4.2.3
-  #   env_file:
-  #     - .env
-  #   container_name: logEntry_mongo
-  #   hostname: mongodb
-  #   restart: on-failure
-  #   environment:
-  #     MONGO_INITDB_USERNAME: root
-  #     MONGO_INITDB_PASSWORD: root
-  #     MONGO_INITDB_DATABASE: root
-  #     MONGO_USER: ${MONGO_USER}
-  #     MONGO_PASS: ${MONGO_PASS}
-  #     MONGO_DATABASE: ${MONGO_DATABASE}
-  #   volumes:
-  #     - ./.docker/mongodb/mongod.conf:/etc/mongod.conf
-  #     - ./.docker/mongodb/initdb.d/:/docker-entrypoint-initdb.d/
-  #     - ./.docker/mongodb/data/db/:/data/db/
-  #     - ./.docker/mongodb/data/log/:/var/log/mongodb/
-  #   ports:
-  #     - '27017-27019:27017-27019'
-  #   command: ['-f', '/etc/mongod.conf']
-
-  # logEntry:
-  #   container_name: logEntry
-  #   image: node:12.15.0-alpine
-  #   env_file:
-  #     - .env
   app:
     container_name: docker-node-mongo
-    image: node:12.15.0
+    image: node:12.16.0-alpine
     working_dir: /home/node/app
     restart: always
     build:
@@ -38,30 +10,23 @@ services:
       dockerfile: Node.Dockerfile
       # args:
       cache_from:
-        - node:12.15.0
+        - node:12.16.0-alpine
       shm_size: "2gb"
     volumes:
       # Mounts the project directory on the host to /home/node/app inside the container
       # allowing you to modify the code without having to rebuild the image.
 
       - ./:/home/node/app
-      - ./.docker/mongodb/data:/data
       # Just specify a path and let the Engine create a volume.
       # node_modules from this new volume will be used and not from your local dev env
       - /home/node/app/node_modules
     ports:
       - "80:2999"
     # Make app available to other containers within links
-    expose:
-      - "2999"
+    # expose:
+    #   - "2999"
     links:
       - mongo
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
 
     ## Just node, no auto restarts
     # command: "npm run start"
@@ -74,8 +39,8 @@ services:
   mongo:
     container_name: mongo
     image: mongo:4.2.3
-    ports: # not required
-      - "27017-27019:27017-27019"
+    # ports: # not required
+    #   - "27017-27019:27017-27019"
     build:
       context: .
       # args:
@@ -83,3 +48,5 @@ services:
         - mongo:4.2.3
       shm_size: "2gb"
       dockerfile: Mongo.Dockerfile
+    volumes:
+      - ./.docker/data:/data
