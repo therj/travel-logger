@@ -6,7 +6,7 @@ const router = Router();
 
 router.get('/', async (req, res, next) => {
   try {
-    const entries = await LogEntry.find();
+    const entries = await LogEntry.find({}).select('-createdAt -updatedAt -__v');
     res.json(entries);
   } catch (error) {
     next(error);

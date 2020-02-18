@@ -2,17 +2,17 @@
 
 ## TODO
 
-- [ ] Setup Server
+- [x] Setup Server
   - [x] Install Dependencies
   - [x] Setup Linter
   - [x] Setup Express App
   - [x] Setup 404 and error middlewares
 - [x] Model DB
   - Plan data to store
-- [ ] Setup Mongoose Models
-- [ ] POST /logs
+- [x] Setup Mongoose Models
+- [x] POST /logs
   - Create a new log entry
-- [ ] GET /logs
+- [x] GET /logs
   - List all log entries
 - [ ] Setup Client
 - [ ] Create a form to add a new entry
